@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El Bocetero — agendas personalizadas para comunidades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f8f2e2;
+  --paper-2:#fdf9ee;
+  --paper-3:#f0e7d0;
+  --ink:#2a2216;
+  --ink-soft:#5c4f3c;
+  --line:#d8c9a4;
+  --red:#cb5b43;
+  --yel:#e2b647;
+  --grn:#679e73;
+  --blu:#5b88b3;
+  --dark:#241d12;
+  --on-dark:#f8f2e2;
+  --font-display:"Caveat",system-ui,sans-serif;
+  --font-body:"Kalam",system-ui,sans-serif;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 80px);scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+body{
+  margin:0;
+  color:var(--ink);
+  font:400 17px/1.65 var(--font-body);
+  background-color:var(--paper);
+  background-image:
+    radial-gradient(ellipse 700px 500px at 8% 4%, rgba(203,91,67,.07), transparent 60%),
+    radial-gradient(ellipse 600px 600px at 96% 28%, rgba(91,136,179,.07), transparent 60%),
+    radial-gradient(ellipse 800px 500px at 50% 100%, rgba(226,182,71,.06), transparent 60%);
+  background-attachment:fixed;
+  min-height:100vh;
+}
+h1,h2,h3{font-family:var(--font-display);line-height:1.05;margin:0 0 .5em;color:var(--ink);letter-spacing:.2px}
+h1{font-size:clamp(2.6rem,6.5vw,4.6rem);font-weight:700}
+h1 em{font-style:normal;background:linear-gradient(transparent 55%, rgba(226,182,71,.55) 55%, rgba(226,182,71,.55) 92%, transparent 92%);padding:0 6px;display:inline-block}
+h2{font-size:clamp(2rem,4.5vw,3rem);font-weight:700;position:relative;padding-bottom:14px}
+h2::after{
+  content:"";position:absolute;left:0;bottom:0;width:170px;height:10px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 10'%3E%3Cpath d='M0 5 Q 21 0 42 5 T 85 5 T 128 5 T 170 5' stroke='%23cb5b43' fill='none' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat;
+  background-size:170px 10px;
+}
+h3{font-family:var(--font-body);font-size:1.25rem;font-weight:700;line-height:1.3}
+a{color:inherit}
+img,svg{max-width:100%}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+section{padding:72px 0}
+
+/* banda tipo cinta de papel */
+.band{
+  height:12px;
+  background:repeating-linear-gradient(90deg,
+    var(--red) 0 28px,
+    var(--yel) 28px 56px,
+    var(--grn) 56px 84px,
+    var(--blu) 84px 112px);
+  border-top:2px solid var(--ink);
+  border-bottom:2px solid var(--ink);
+}
+
+/* barra superior */
+.bar{background:var(--ink);color:var(--on-dark);font-size:.92rem}
+.bar .wrap{display:flex;gap:6px 22px;flex-wrap:wrap;justify-content:center;padding-block:8px}
+.bar a{font-weight:700;text-decoration:none;color:var(--on-dark)}
+.bar a:hover{color:var(--yel)}
+
+/* navegación */
+header.nav{
+  position:sticky;top:0;z-index:20;
+  background:var(--paper);
+  padding-top:env(safe-area-inset-top,0px);
+}
+header.nav::after{
+  content:"";position:absolute;left:0;right:0;bottom:-4px;height:6px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 6'%3E%3Cpath d='M0 3 Q 15 0 30 3 T 60 3' stroke='%232a2216' stroke-width='2' fill='none'/%3E%3C/svg%3E") repeat-x;
+  background-size:60px 6px;
+}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:64px}
+.brand{font:700 1.55rem var(--font-display);text-decoration:none;letter-spacing:.4px;transform:rotate(-1.5deg);display:inline-block}
+.nav nav{display:flex;gap:22px;align-items:center}
+.nav nav a{text-decoration:none;font-weight:700;font-size:.98rem;position:relative}
+.nav nav a:not(.btn):hover{color:var(--red)}
+.nav nav a:not(.btn)::after{
+  content:"";position:absolute;left:0;right:0;bottom:-4px;height:3px;
+  background:currentColor;border-radius:2px;transform:scaleX(0);transform-origin:left;transition:transform .2s;
+}
+.nav nav a:not(.btn):hover::after{transform:scaleX(1)}
+
+/* botones */
+.btn{
+  display:inline-block;
+  background:var(--red);
+  color:#fff;
+  border:2.5px solid var(--ink);
+  border-radius:14px 20px 12px 18px / 18px 12px 20px 14px;
+  padding:12px 26px;
+  font:700 1rem var(--font-body);
+  text-decoration:none;
+  cursor:pointer;
+  box-shadow:4px 4px 0 var(--ink);
+  transition:transform .1s ease, box-shadow .1s ease;
+  text-align:center;
+}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.alt{background:var(--paper-2);color:var(--ink)}
+.btn:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,button:focus-visible{outline:3px dashed var(--blu);outline-offset:3px}
+
+/* menú móvil */
+.menu{display:none;background:var(--paper-2);border:2px solid var(--ink);color:var(--ink);border-radius:10px 14px 8px 12px;padding:6px 14px;font:700 .95rem var(--font-body);box-shadow:3px 3px 0 var(--ink);cursor:pointer}
+@media(max-width:820px){
+  .menu{display:block}
+  .nav nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--paper);flex-direction:column;align-items:flex-start;padding:18px 20px;gap:14px;border-bottom:2px solid var(--ink)}
+  .nav nav.open{display:flex}
+}
+
+/* hero */
+.hero{padding-top:60px}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.hero p.lead{font-size:1.15rem;color:var(--ink-soft);max-width:34em}
+.cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px}
+@media(max-width:820px){.hero .wrap{grid-template-columns:1fr;gap:32px}}
+
+/* ============================================
+   CARRUSEL (reemplaza al marco polaroid)
+   ============================================ */
+.carousel{
+  position:relative;
+  width:100%;
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  overflow:hidden;
+  border-radius:18px;
+}
+.carousel-track{
+  display:flex;
+  transition:transform .45s ease;
+  will-change:transform;
+}
+.carousel-slide{
+  flex:0 0 100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:0;
+  background:transparent;
+}
+.carousel-slide img{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:520px;
+  object-fit:contain;
+  background:transparent;
+  border:none;
+  border-radius:0;
+  filter:drop-shadow(0 10px 18px rgba(42,34,22,.18));
+}
+
+/* botones de navegación */
+.carousel-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:3;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:2.5px solid var(--ink);
+  background:var(--paper-2);
+  color:var(--ink);
+  font:700 1.4rem/1 var(--font-body);
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  box-shadow:3px 3px 0 var(--ink);
+  transition:transform .12s ease, box-shadow .12s ease, background .15s;
+  padding:0;
+}
+.carousel-btn:hover{background:var(--yel);transform:translateY(-50%) translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.carousel-btn:active{transform:translateY(-50%) translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.carousel-btn.prev{left:10px}
+.carousel-btn.next{right:10px}
+.carousel-btn:disabled{opacity:.35;cursor:not-allowed;box-shadow:1px 1px 0 var(--ink)}
+
+/* puntos indicadores */
+.carousel-dots{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  margin-top:14px;
+  flex-wrap:wrap;
+}
+.carousel-dot{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  border:2px solid var(--ink);
+  background:var(--paper-2);
+  cursor:pointer;
+  padding:0;
+  transition:background .15s, transform .15s;
+}
+.carousel-dot.active{background:var(--red);transform:scale(1.2)}
+.carousel-dot:hover{background:var(--yel)}
+
+/* contador opcional */
+.carousel-count{
+  position:absolute;
+  bottom:10px;
+  right:14px;
+  z-index:3;
+  font:700 .85rem var(--font-body);
+  background:var(--paper-2);
+  border:2px solid var(--ink);
+  border-radius:999px;
+  padding:2px 12px;
+  color:var(--ink);
+  box-shadow:2px 2px 0 var(--ink);
+}
+
+/* tarjetas */
+.grid{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{
+  background:var(--paper-2);
+  border:2.5px solid var(--ink);
+  border-radius:22px 8px 20px 10px / 10px 20px 8px 22px;
+  padding:24px;
+  box-shadow:5px 5px 0 var(--ink);
+  transform:rotate(-0.4deg);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.card:nth-child(even){transform:rotate(0.5deg)}
+.card:hover{transform:rotate(0) translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+.card .ico{
+  width:56px;height:56px;
+  border-radius:50% 42% 55% 45% / 45% 55% 40% 50%;
+  display:grid;place-items:center;
+  font-size:1.6rem;
+  margin-bottom:16px;
+  border:2px solid var(--ink);
+  box-shadow:3px 3px 0 var(--ink);
+  transform:rotate(-4deg);
+}
+.c1{background:var(--red)}
+.c2{background:var(--yel)}
+.c3{background:var(--grn)}
+.c4{background:var(--blu)}
+
+/* bloque tintado tipo hoja de cuaderno */
+.tint{
+  background-color:var(--paper-2);
+  background-image:
+    linear-gradient(90deg, transparent 48px, rgba(203,91,67,.28) 48px, rgba(203,91,67,.28) 50px, transparent 50px),
+    repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(91,136,179,.13) 31px, rgba(91,136,179,.13) 32px);
+  border-top:2px dashed var(--line);
+  border-bottom:2px dashed var(--line);
+}
+.split{display:grid;gap:48px;grid-template-columns:1.05fr .95fr;align-items:center}
+@media(max-width:820px){.split{grid-template-columns:1fr}}
+.lede{color:var(--ink-soft);max-width:40em}
+
+/* utilidades nuevas (sin alterar la estética) */
+.center{text-align:center}
+.center h2::after{left:50%;transform:translateX(-50%)}
+.split.rev{grid-template-columns:.95fr 1.05fr}
+@media(max-width:820px){.split.rev{grid-template-columns:1fr}}
+
+/* partes de la agenda tipo etiquetas */
+.parts{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-top:26px}
+.part{
+  background:var(--paper-2);
+  border:2px solid var(--ink);
+  border-left-width:9px;
+  border-left-color:var(--red);
+  border-radius:4px 14px 6px 12px;
+  padding:14px 16px;
+  box-shadow:3px 3px 0 rgba(42,34,22,.18);
+  transform:rotate(-0.4deg);
+  font-size:.95rem;
+}
+.part:nth-child(2){border-left-color:var(--yel);transform:rotate(0.5deg)}
+.part:nth-child(3){border-left-color:var(--grn);transform:rotate(-0.4deg)}
+.part:nth-child(4){border-left-color:var(--blu);transform:rotate(0.3deg)}
+.part b{display:block;font-family:var(--font-body);font-weight:700;color:var(--ink);margin-bottom:2px;font-size:1rem}
+
+/* panel reutilizable para el CTA final */
+.panel{
+  background:var(--paper-2);
+  border:2px solid var(--ink);
+  border-radius:16px 22px 14px 20px / 20px 14px 22px 16px;
+  padding:22px;
+  box-shadow:4px 4px 0 rgba(42,34,22,.16);
+}
+
+/* preguntas frecuentes */
+details{
+  background:var(--paper-2);
+  border:2px solid var(--ink);
+  border-radius:14px 18px 10px 16px;
+  padding:16px 20px;
+  margin-bottom:12px;
+  box-shadow:3px 3px 0 rgba(42,34,22,.15);
+}
+details[open]{background:var(--paper-3)}
+summary{font-weight:700;cursor:pointer;font-family:var(--font-body);font-size:1.02rem}
+summary::-webkit-details-marker{display:none}
+summary::marker{content:""}
+details p{margin:10px 0 0;color:var(--ink-soft)}
+
+/* pie de página */
+footer{
+  background:var(--dark);
+  color:var(--on-dark);
+  padding:56px 0 36px;
+  position:relative;
+}
+footer::before{
+  content:"";position:absolute;left:0;right:0;top:-4px;height:8px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 8'%3E%3Cpath d='M0 4 Q 15 0 30 4 T 60 4' stroke='%23241d12' stroke-width='3' fill='none'/%3E%3C/svg%3E") repeat-x;
+  background-size:60px 8px;
+}
+footer .wrap{display:grid;gap:32px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+footer h3{color:var(--on-dark);font-family:var(--font-display);font-size:1.5rem;font-weight:700}
+footer p{color:var(--on-dark);opacity:.85;margin:0}
+.soc{display:flex;gap:10px;flex-wrap:wrap}
+.soc a{
+  border:2px solid var(--on-dark);
+  border-radius:999px;
+  padding:8px 18px;
+  text-decoration:none;
+  font-weight:700;
+  font-family:var(--font-body);
+  color:var(--on-dark);
+  transition:all .15s;
+}
+.soc a:hover{background:var(--yel);border-color:var(--yel);color:#2b1d14}
+</style>
+</head>
+<body>
+
+<div class="bar"><div class="wrap"><span>Escríbenos:</span><a href="https://wa.me/+57 321 2316718 - 3157359260">WhatsApp +57 321 2316718 - 3157359260</a><a href="mailto:contacto@tudominio.com"></a></div></div>
+
+<header class="nav"><div class="wrap">
+<a class="brand" href="#inicio">El Bocetero</a>
+<button class="menu" id="mb" aria-expanded="false" aria-controls="nv">Menú</button>
+<nav id="nv">
+  <a href="#producto">Producto</a>
+  <a href="#personaliza">Personaliza</a>
+  <a href="#regalos">Regalos</a>
+  <a href="#marca">Marcas</a>
+  <a class="btn" href="#crear">Cotizar</a>
+</nav>
+</div></header>
+
+<main>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="inicio"><div class="wrap">
+<div class="hero-copy">
+<h1>Tus ideas merecen un lugar especial.<br>Nosotros les damos forma</h1>
+<p class="lead">Creamos agendas, cuadernos y libretas personalizadas para escribir tus sueños, organizar tus proyectos, expresar tu creatividad y conservar esos momentos que quieres recordar.
+<br>Diseñamos cada pieza a tu gusto, combinando formatos, tamaños, materiales y acabados para crear productos únicos, hechos para ti o para sorprender a alguien especial.</p>
+<div class="cta"><a class="btn" href="#crear">Diseña tu agenda</a><a class="btn alt" href="#producto">Conoce el producto</a></div>
+</div>
+
+<!-- CARRUSEL HERO -->
+<div class="carousel" id="carousel-hero">
+  <div class="carousel-track" id="track-hero">
+    <div class="carousel-slide"><img src="images/portada.png" alt="Agendas personalizadas El Bocetero"
+      onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 500%22%3E%3Crect width=%22400%22 height=%22500%22 fill=%22transparent%22/%3E%3Ctext x=%22200%22 y=%22245%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3EAgrega aquí tu imagen%3C/text%3E%3Ctext x=%22200%22 y=%22278%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3E(portada.png)%3C/text%3E%3C/svg%3E';this.onerror=null"></div>
+    <div class="carousel-slide"><img src="images/portada-2.png" alt="Agenda artesanal El Bocetero"
+      onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 500%22%3E%3Crect width=%22400%22 height=%22500%22 fill=%22transparent%22/%3E%3Ctext x=%22200%22 y=%22245%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3EAgrega aquí tu imagen%3C/text%3E%3Ctext x=%22200%22 y=%22278%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3E(portada-2.png)%3C/text%3E%3C/svg%3E';this.onerror=null"></div>
+    <div class="carousel-slide"><img src="images/portada-3.png" alt="Detalle de agenda El Bocetero"
+      onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 500%22%3E%3Crect width=%22400%22 height=%22500%22 fill=%22transparent%22/%3E%3Ctext x=%22200%22 y=%22245%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3EAgrega aquí tu imagen%3C/text%3E%3Ctext x=%22200%22 y=%22278%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3E(portada-3.png)%3C/text%3E%3C/svg%3E';this.onerror=null"></div>
+  </div>
+  <button class="carousel-btn prev" aria-label="Imagen anterior">‹</button>
+  <button class="carousel-btn next" aria-label="Imagen siguiente">›</button>
+  <span class="carousel-count" id="count-hero">1 / 3</span>
+  <div class="carousel-dots" id="dots-hero"></div>
+</div>
+</div></section>
+
+<div class="band"></div>
+
+<!-- ============ PRODUCTO ============ -->
+<section id="producto"><div class="wrap">
+<h2>Un Bocetero para cada idea, cada proyecto y cada momento.</h2>
+<p class="lede">No todas las ideas son iguales, por eso creamos productos que se adaptan a ti. Desde una libreta para tus pensamientos hasta una agenda para organizar tus días o un cuaderno profesional para presentar tus proyectos.
+
+Tú eliges para qué lo necesitas. Nosotros lo hacemos realidad.</p>
+<div class="grid" style="margin-top:32px">
+<div class="card"><div class="ico c1">📖</div><h3>Ideas y proyectos</h3><p>Un espacio para planear, escribir, dibujar y darle forma a todo lo que imaginas.</p></div>
+<div class="card"><div class="ico c2">🕰️</div><h3>Recuerdos especiales</h3><p>Conserva tus fotografías, pensamientos, historias y momentos favoritos.</p></div>
+<div class="card"><div class="ico c3">🌿</div><h3>Imagen profesional</h3><p>Presenta tus ideas, portafolios y proyectos con una imagen cuidada y profesional.</p></div>
+<div class="card"><div class="ico c4">🎭</div><h3>Regalos personalizados</h3><p>Personalízala con fotografías de tu familia, amigos, mascotas.</p></div>
+</div></div></section>
+
+<!-- ============ PERSONALIZA ============ -->
+<section class="tint" id="personaliza"><div class="wrap split">
+<div>
+<h2>Hecho a tu medida, personalizado a tu estilo.</h2>
+<p class="lede">Cada Bocetero es una oportunidad para crear algo diferente. Elige el formato, los materiales, los colores y los acabados que más te gusten. Nosotros nos encargamos de convertir tu idea en una agenda, cuaderno o libreta con una presentación impecable.</p>
+<div class="parts">
+<div class="part"><b>Formatos y tamaños</b>Agendas, cuadernos y libretas argolladas en diferentes formatos y tamaños. Encuentra el que mejor se adapta a lo que necesitas.</div>
+<div class="part"><b>Portadas personalizadas</b>Diseños únicos con tus fotografías, ilustraciones, logotipos, colores o imágenes favoritas. ¡Haz que sea realmente tuyo!</div>
+<div class="part"><b>Páginas interiores</b>Elige páginas rayadas, cuadriculadas, en blanco o con diseños personalizados. Un interior pensado para escribir, dibujar, planear o crear.</div>
+<div class="part"><b>Materiales y acabados</b>Explora una amplia variedad de materiales, texturas y acabados. Combinaciones que aportan personalidad, calidad y una presentación especial.</div>
+</div></div>
+
+<!-- CARRUSEL PERSONALIZA -->
+<div class="carousel" id="carousel-personaliza">
+  <div class="carousel-track" id="track-personaliza">
+    <div class="carousel-slide"><img src="images/personaliza.png" alt="Interior y detalles de las agendas El Bocetero"
+      onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 440 340%22%3E%3Crect width=%22440%22 height=%22340%22 fill=%22transparent%22/%3E%3Ctext x=%22220%22 y=%22170%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3EAgrega aquí tu imagen%3C/text%3E%3Ctext x=%22220%22 y=%22200%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3E(personaliza.png)%3C/text%3E%3C/svg%3E';this.onerror=null"></div>
+    <div class="carousel-slide"><img src="images/personaliza-2.png" alt="Tapas y separadores personalizados"
+      onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 440 340%22%3E%3Crect width=%22440%22 height=%22340%22 fill=%22transparent%22/%3E%3Ctext x=%22220%22 y=%22170%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3EAgrega aquí tu imagen%3C/text%3E%3Ctext x=%22220%22 y=%22200%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3E(personaliza-2.png)%3C/text%3E%3C/svg%3E';this.onerror=null"></div>
+    <div class="carousel-slide"><img src="images/personaliza-3.png" alt="Acabados y materiales El Bocetero"
+      onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 440 340%22%3E%3Crect width=%22440%22 height=%22340%22 fill=%22transparent%22/%3E%3Ctext x=%22220%22 y=%22170%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3EAgrega aquí tu imagen%3C/text%3E%3Ctext x=%22220%22 y=%22200%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3E(personaliza-3.png)%3C/text%3E%3C/svg%3E';this.onerror=null"></div>
+  </div>
+  <button class="carousel-btn prev" aria-label="Imagen anterior">‹</button>
+  <button class="carousel-btn next" aria-label="Imagen siguiente">›</button>
+  <span class="carousel-count" id="count-personaliza">1 / 3</span>
+  <div class="carousel-dots" id="dots-personaliza"></div>
+</div>
+</div></section>
+
+<!-- ============ REGALOS ============ -->
+<section id="regalos"><div class="wrap split">
+<div>
+<h2>Un regalo que cuenta una historia.</h2>
+<p class="lede">Hay regalos que se usan y otros que se recuerdan. Imagina una agenda con la foto de tu familia, una libreta con la imagen de tu mascota o un cuaderno diseñado especialmente para alguien que quieres.</p>
+<p class="lede">También puedes sorprender a tus clientes, colaboradores o amigos con un detalle personalizado que lleve tu marca o transmita un mensaje especial.</p>
+<p class="lede">Porque los mejores regalos no son los más grandes, sino los que tienen un significado.</p>
+<div class="cta"><a class="btn" href="https://wa.me/570000000000?text=Hola%2C%20quiero%20crear%20un%20regalo%20especial%20con%20El%20Bocetero." target="_blank" rel="noopener">Crea un regalo especial</a></div>
+</div>
+
+<!-- CARRUSEL REGALOS -->
+<div class="carousel" id="carousel-regalos">
+  <div class="carousel-track" id="track-regalos">
+    <div class="carousel-slide"><img src="images/regalo.png" alt="Agenda personalizada como regalo especial"
+      onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 440 340%22%3E%3Crect width=%22440%22 height=%22340%22 fill=%22transparent%22/%3E%3Ctext x=%22220%22 y=%22170%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3EAgrega aquí tu imagen%3C/text%3E%3Ctext x=%22220%22 y=%22200%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3E(regalo.png)%3C/text%3E%3C/svg%3E';this.onerror=null"></div>
+    <div class="carousel-slide"><img src="images/regalo-2.png" alt="Detalle de regalo personalizado"
+      onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 440 340%22%3E%3Crect width=%22440%22 height=%22340%22 fill=%22transparent%22/%3E%3Ctext x=%22220%22 y=%22170%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3EAgrega aquí tu imagen%3C/text%3E%3Ctext x=%22220%22 y=%22200%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3E(regalo-2.png)%3C/text%3E%3C/svg%3E';this.onerror=null"></div>
+  </div>
+  <button class="carousel-btn prev" aria-label="Imagen anterior">‹</button>
+  <button class="carousel-btn next" aria-label="Imagen siguiente">›</button>
+  <span class="carousel-count" id="count-regalos">1 / 2</span>
+  <div class="carousel-dots" id="dots-regalos"></div>
+</div>
+</div></section>
+
+<!-- ============ MARCA ============ -->
+<section class="tint" id="marca"><div class="wrap split rev">
+
+<!-- CARRUSEL MARCA -->
+<div class="carousel" id="carousel-marca">
+  <div class="carousel-track" id="track-marca">
+    <div class="carousel-slide"><img src="images/marca.png" alt="Agendas personalizadas con la marca de tu empresa"
+      onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 440 340%22%3E%3Crect width=%22440%22 height=%22340%22 fill=%22transparent%22/%3E%3Ctext x=%22220%22 y=%22170%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3EAgrega aquí tu imagen%3C/text%3E%3Ctext x=%22220%22 y=%22200%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3E(marca.png)%3C/text%3E%3C/svg%3E';this.onerror=null"></div>
+    <div class="carousel-slide"><img src="images/marca-2.png" alt="Cuaderno corporativo El Bocetero"
+      onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 440 340%22%3E%3Crect width=%22440%22 height=%22340%22 fill=%22transparent%22/%3E%3Ctext x=%22220%22 y=%22170%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3EAgrega aquí tu imagen%3C/text%3E%3Ctext x=%22220%22 y=%22200%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3E(marca-2.png)%3C/text%3E%3C/svg%3E';this.onerror=null"></div>
+    <div class="carousel-slide"><img src="images/marca-3.png" alt="Regalo empresarial El Bocetero"
+      onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 440 340%22%3E%3Crect width=%22440%22 height=%22340%22 fill=%22transparent%22/%3E%3Ctext x=%22220%22 y=%22170%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3EAgrega aquí tu imagen%3C/text%3E%3Ctext x=%22220%22 y=%22200%22 font-family=%22sans-serif%22 font-size=%2216%22 fill=%22%235c4f3c%22 text-anchor=%22middle%22%3E(marca-3.png)%3C/text%3E%3C/svg%3E';this.onerror=null"></div>
+  </div>
+  <button class="carousel-btn prev" aria-label="Imagen anterior">‹</button>
+  <button class="carousel-btn next" aria-label="Imagen siguiente">›</button>
+  <span class="carousel-count" id="count-marca">1 / 3</span>
+  <div class="carousel-dots" id="dots-marca"></div>
+</div>
+
+<div>
+<h2>Tu marca también merece destacarse.</h2>
+<p class="lede">Creamos agendas, libretas y cuadernos personalizados para empresas, emprendimientos, instituciones y profesionales que buscan comunicar su identidad a través de cada detalle.</p>
+<p class="lede">Incorpora tu logotipo, colores corporativos y diseños propios para crear productos que representen tu marca.</p>
+<p class="lede">Ideales para regalos empresariales, eventos, presentaciones, portafolios y material promocional.</p>
+<div class="cta"><a class="btn" href="https://wa.me/570000000000?text=Hola%2C%20quiero%20personalizar%20agendas%20con%20la%20marca%20de%20mi%20empresa." target="_blank" rel="noopener">Personaliza con tu marca</a></div>
+</div>
+</div></section>
+
+<!-- ============ CTA FINAL ============ -->
+<section id="crear"><div class="wrap" style="max-width:860px">
+<div class="panel center" style="padding:48px 36px;box-shadow:7px 7px 0 var(--ink);border-width:2.5px;margin:0">
+<h2 style="margin-bottom:.3em">Todo comienza con una idea. ¡Hagámosla realidad!</h2>
+<p class="lede" style="margin:0 auto 6px">Cuéntanos qué tienes en mente. Nosotros te ayudamos a convertirlo en una agenda, cuaderno o libreta diseñada especialmente para ti.</p>
+<p class="lede" style="margin:0 auto 28px">Elige, personaliza y crea un Bocetero que hable de ti.</p>
+<a class="btn" href="https://wa.me/570000000000?text=Hola%2C%20quiero%20crear%20mi%20Bocetero%20personalizado." target="_blank" rel="noopener">Quiero crear mi Bocetero</a>
+</div>
+</div></section>
+
+</main>
+
+<footer><div class="wrap">
+<div><h3>El Bocetero</h3><p>Diseñamos cada pieza a tu gusto, hechos para ti o para sorprender a alguien especial.</p></div>
+<div><h3>Contacto</h3><p>WhatsApp: +57 321 2316718<br>3157359260<br>Pasto, Nariño, Colombia</p></div>
+<div><h3>Síguenos</h3><div class="soc"><a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a><a href="https://facebook.com/" target="_blank" rel="noopener">Facebook</a><a href="https://youtube.com/" target="_blank" rel="noopener">YouTube</a></div></div>
+</div></footer>
+
+<script>
+/* menú móvil */
+var $ = function(i){return document.getElementById(i)};
+
+$("mb").onclick = function(){
+  var o = $("nv").classList.toggle("open");
+  this.setAttribute("aria-expanded", o);
+};
+$("nv").addEventListener("click", function(e){
+  if (e.target.tagName == "A") $("nv").classList.remove("open");
+});
+
+/* ============================================
+   CARRUSELES (sin avance automático)
+   ============================================ */
+document.querySelectorAll('.carousel').forEach(function(carousel){
+  var track = carousel.querySelector('.carousel-track');
+  var slides = track.querySelectorAll('.carousel-slide');
+  var prevBtn = carousel.querySelector('.carousel-btn.prev');
+  var nextBtn = carousel.querySelector('.carousel-btn.next');
+  var dotsContainer = carousel.querySelector('.carousel-dots');
+  var countEl = carousel.querySelector('.carousel-count');
+  var total = slides.length;
+  var index = 0;
+
+  // Crear puntos indicadores
+  for(var i = 0; i < total; i++){
+    var dot = document.createElement('button');
+    dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Ir a la imagen ' + (i+1));
+    dot.dataset.index = i;
+    dot.addEventListener('click', function(){
+      goTo(parseInt(this.dataset.index));
+    });
+    dotsContainer.appendChild(dot);
+  }
+
+  var dots = dotsContainer.querySelectorAll('.carousel-dot');
+
+  function goTo(i){
+    index = Math.max(0, Math.min(i, total - 1));
+    track.style.transform = 'translateX(-' + (index * 100) + '%)';
+    dots.forEach(function(d, j){ d.classList.toggle('active', j === index); });
+    if(countEl) countEl.textContent = (index + 1) + ' / ' + total;
+    prevBtn.disabled = index === 0;
+    nextBtn.disabled = index === total - 1;
+  }
+
+  prevBtn.addEventListener('click', function(){ goTo(index - 1); });
+  nextBtn.addEventListener('click', function(){ goTo(index + 1); });
+
+  // Soporte teclado (solo cuando el foco está dentro del carrusel)
+  carousel.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowLeft'){ goTo(index - 1); e.preventDefault(); }
+    if(e.key === 'ArrowRight'){ goTo(index + 1); e.preventDefault(); }
+  });
+
+  // Inicializar
+  goTo(0);
+});
+</script>
+</body>
+</html>
